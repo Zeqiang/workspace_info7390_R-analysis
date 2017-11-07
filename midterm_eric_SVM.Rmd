@@ -1,0 +1,398 @@
+---
+title: "Mid-term Project R Notebook"
+output: html_notebook
+---
+
+1. Import train data
+```{r}
+train.data <- read.csv("/Users/lzq/Documents/course material/INFO 7390 - Das/Midterm_project/dataset/train.csv")
+
+str(train.data)
+head(train.data)
+```
+
+2. Import test dataset
+```{r}
+test.data <- read.csv("/Users/lzq/Documents/course material/INFO 7390 - Das/Midterm_project/dataset/test.csv")
+
+str(test.data)
+head(test.data)
+```
+
+3. Remove columns that has too much missing value
+```{r}
+ValueMissingVecTrain <- NA
+for (i in (1:127)) ValueMissingVecTrain[i] <- sum(is.na(train.data[,i]))/nrow(train.data)
+inedxMatRemove1 <- which(ValueMissingVecTrain >= 0.55)
+ValueMissingVecTest <- NA
+for (i in (1:127)) ValueMissingVecTest[i] <- sum(is.na(test.data[,i]))/nrow(test.data)
+inedxMatRemove2 <- which(ValueMissingVecTest >= 0.55)
+
+inedxMatRemove1
+inedxMatRemove2
+
+train.data.processed <- train.data[,-inedxMatRemove1]
+test.data.processed <- test.data[,-inedxMatRemove1]
+```
+
+4. Get rows that have NA values
+```{r}
+# inedxMatTestKeep <- which(ValueMissingVecTrain < 0.55 & ValueMissingVecTrain > 0)
+# inedxMatTestKeep
+
+ValueMissingColTrain <- NA
+for (i in (1:122)) ValueMissingColTrain[i] <- sum(is.na(train.data.processed[,i]))
+inedxMatKeep1 <- which(ValueMissingColTrain > 0)
+
+ValueMissingColText <- NA
+for (i in (1:121)) ValueMissingColText[i] <- sum(is.na(test.data.processed[,i]))
+inedxMatKeep2 <- which(ValueMissingColText > 0)
+
+inedxMatKeep1
+inedxMatKeep2
+
+```
+
+5. Filling NA value in 13 Column for train.data.processed
+```{r}
+colnames(train.data.processed)[13]    # Continuous
+paste("Number of missing value:", sum(is.na(train.data.processed[,13])))
+print("--------------------------------------------------------------------------------------")
+str(train.data.processed[,13])
+print("--------------------------------------------------------------------------------------")
+
+paste("MEAN  :", mean(train.data.processed[,13], na.rm = TRUE))
+paste("MEDIAN:", median(train.data.processed[,13], na.rm = TRUE))
+paste("MAX   :", max(train.data.processed[,13], na.rm = TRUE))
+paste("MIN   :", min(train.data.processed[,13], na.rm = TRUE))
+
+# most value is around 0.06, less than 0.1
+# we choose Average as missing value
+train.data.processed.filling <- train.data.processed
+test.data.processed.filling <- test.data.processed
+train.data.processed.filling[,13][is.na(train.data.processed.filling[,13])] <- 0.078
+test.data.processed.filling[,13][is.na(test.data.processed.filling[,13])] <- 0.078
+```
+
+6. Filling NA value in 16 Column for train.data.processed
+```{r}
+colnames(train.data.processed)[16]    # Continuous
+paste("Number of missing value:", sum(is.na(train.data.processed[,16])))
+print("--------------------------------------------------------------------------------------")
+str(train.data.processed[,16])
+print("--------------------------------------------------------------------------------------")
+
+paste("MEAN  :", mean(train.data.processed[,16], na.rm = TRUE))
+paste("MEDIAN:", median(train.data.processed[,16], na.rm = TRUE))
+paste("MAX   :", max(train.data.processed[,16], na.rm = TRUE))
+paste("MIN   :", min(train.data.processed[,16], na.rm = TRUE))
+percentage_0 <- length(which(train.data.processed[,16] == 0)) / length(which(!is.na(train.data.processed[,16])))
+paste("Percentage of Value 0:", paste(percentage_0*100, "%", sep=''))
+
+# more than 84% of column 16 is 0, we choose 0 as missing value
+train.data.processed.filling[,16][is.na(train.data.processed.filling[,16])] <- 0
+test.data.processed.filling[,16][is.na(test.data.processed.filling[,16])] <- 0
+```
+
+7. Filling NA value in 18 Column for train.data.processed
+```{r}
+colnames(train.data.processed)[18]    # Continuous
+paste("Number of missing value:", sum(is.na(train.data.processed[,18])))
+print("--------------------------------------------------------------------------------------")
+str(train.data.processed[,18])
+print("--------------------------------------------------------------------------------------")
+
+paste("MEAN  :", mean(train.data.processed[,18], na.rm = TRUE))
+paste("MEDIAN:", median(train.data.processed[,18], na.rm = TRUE))
+paste("MAX   :", max(train.data.processed[,18], na.rm = TRUE))
+paste("MIN   :", min(train.data.processed[,18], na.rm = TRUE))
+
+# 18 column is Continuous from 0 to 1, we choose average as missing value
+train.data.processed.filling[,18][is.na(train.data.processed.filling[,18])] <- 0.36
+test.data.processed.filling[,18][is.na(test.data.processed.filling[,18])] <- 0.36
+```
+
+8. Filling NA value in 30 Column for train.data.processed
+```{r}
+colnames(train.data.processed)[30]    # Continuous
+paste("Number of missing value:", sum(is.na(train.data.processed[,30])))
+print("--------------------------------------------------------------------------------------")
+str(train.data.processed[,30])
+print("--------------------------------------------------------------------------------------")
+
+paste("MEAN  :", mean(train.data.processed[,30], na.rm = TRUE))
+paste("MEDIAN:", median(train.data.processed[,30], na.rm = TRUE))
+paste("MAX   :", max(train.data.processed[,30], na.rm = TRUE))
+paste("MIN   :", min(train.data.processed[,30], na.rm = TRUE))
+percentage_0.01 <- length(which(train.data.processed[,30] < 0.01)) / length(which(!is.na(train.data.processed[,30])))
+paste("Percentage of Value less than 0.01:", paste(percentage_0.01*100, "%", sep=''))
+
+# more than 98% of column 30 is less than 0.01, we choose 0 as missing value
+train.data.processed.filling[,30][is.na(train.data.processed.filling[,30])] <- 0
+test.data.processed.filling[,30][is.na(test.data.processed.filling[,30])] <- 0
+```
+
+9. Filling NA value in 35 Column for train.data.processed
+```{r}
+colnames(train.data.processed)[35]    # Continuous
+paste("Number of missing value:", sum(is.na(train.data.processed[,35])))
+print("--------------------------------------------------------------------------------------")
+str(train.data.processed[,35])
+print("--------------------------------------------------------------------------------------")
+
+paste("MEAN  :", mean(train.data.processed[,35], na.rm = TRUE))
+paste("MEDIAN:", median(train.data.processed[,35], na.rm = TRUE))
+paste("MAX   :", max(train.data.processed[,35], na.rm = TRUE))
+paste("MIN   :", min(train.data.processed[,35], na.rm = TRUE))
+
+# MEAN and MEDIAN is similiar, column 35 has Continuous data between 0 to 1
+# we choose median as missing value
+train.data.processed.filling[,35][is.na(train.data.processed.filling[,35])] <- 0.46
+test.data.processed.filling[,35][is.na(test.data.processed.filling[,35])] <- 0.46
+```
+
+10. Filling NA value in 36 Column for train.data.processed
+```{r}
+colnames(train.data.processed)[36]    # Continuous
+paste("Number of missing value:", sum(is.na(train.data.processed[,35])))
+print("--------------------------------------------------------------------------------------")
+str(train.data.processed[,36])
+print("--------------------------------------------------------------------------------------")
+
+paste("MEAN  :", mean(train.data.processed[,36], na.rm = TRUE))
+paste("MEDIAN:", median(train.data.processed[,36], na.rm = TRUE))
+paste("MAX   :", max(train.data.processed[,36], na.rm = TRUE))
+paste("MIN   :", min(train.data.processed[,36], na.rm = TRUE))
+
+# MEAN and MEDIAN is similiar, column 36 has Continuous data between 0 to 1
+# we choose median as missing value
+train.data.processed.filling[,36][is.na(train.data.processed.filling[,36])] <- 0.44
+test.data.processed.filling[,36][is.na(test.data.processed.filling[,36])] <- 0.44
+```
+
+11. Filling NA value in 37 Column for train.data.processed
+```{r}
+colnames(train.data.processed)[37]    # Discrete
+paste("Number of missing value:", sum(is.na(train.data.processed[,37])))
+print("--------------------------------------------------------------------------------------")
+str(train.data.processed[,37])
+print("--------------------------------------------------------------------------------------")
+
+paste("MEAN  :", mean(train.data.processed[,37], na.rm = TRUE))
+paste("MEDIAN:", median(train.data.processed[,37], na.rm = TRUE))
+paste("MAX   :", max(train.data.processed[,37], na.rm = TRUE))
+paste("MIN   :", min(train.data.processed[,37], na.rm = TRUE))
+b <- table(train.data.processed[,37])
+paste("MODE  :", as.numeric(names(b)[b == max(b)]))
+
+# Column 37 is discrete, range between 0 to 240
+# we choose to set Mode "1" as the missing value, because its repetition rate is high
+train.data.processed.filling[,37][is.na(train.data.processed.filling[,37])] <- 1
+test.data.processed.filling[,37][is.na(test.data.processed.filling[,37])] <- 1
+```
+
+12. Convert Product_Info_2 from factor to numeric, Remove ID
+```{r}
+train.data.processed.convert <- train.data.processed.filling
+test.data.processed.convert <- test.data.processed.filling
+
+train.data.processed.convert[,3] <- as.numeric(train.data.processed.convert[,3])
+test.data.processed.convert[,3] <- as.numeric(test.data.processed.convert[,3])
+
+train.data.processed.convert <- train.data.processed.convert[,-1]
+test.data.processed.convert <- test.data.processed.convert[,-1]
+
+str(train.data.processed.convert)
+```
+
+13. Create linear regression to make first dimensionality reduction
+```{r}
+# create linear regression model using train.data.processed.convert
+lm.model.reduceDim <- lm(Response ~ ., data=train.data.processed.convert)
+# summary(lm.model.reduceDim)
+
+# select column that p value <= 0.05, creat new dataframe
+p_val <- summary(lm.model.reduceDim)$coef
+select_col <- rownames(data.frame(p_val[p_val[,4] <= 0.05, 4])[,0])
+
+train.data.selectCol <- train.data.processed.convert[,select_col]
+test.data.selectCol <- test.data.processed.convert[,select_col]
+str(train.data.selectCol)
+```
+
+14. Convert all categorical variables as factor and check the structure
+```{r}
+train.data.cat <- train.data.selectCol
+test.data.cat <- test.data.selectCol
+
+categorical.names <- c(paste("Product_Info_", c(1:3,5:7), sep=""),"Employment_Info_3",paste("InsuredInfo_", c(1:2,5:7), sep=""), paste("Insurance_History_", c(1:3,7:8), sep=""),paste("Medical_History_", c(2:5,7,11:14, 17:20, 22:23, 27:31,35,37:41), sep=""))
+
+for(i in categorical.names) train.data.cat[,i]<-as.factor(train.data.cat[,i])
+for(i in categorical.names) test.data.cat[,i]<-as.factor(test.data.cat[,i])
+str(train.data.cat)
+```
+
+15. Convert all categorical variables to binary format using 0-N transformation
+```{r}
+train.data.binary <- train.data.cat
+test.data.binary <- test.data.cat
+categorical.indexes <- c(1:3, 5:7, 12:22, 26:51)
+
+for(i in categorical.indexes){
+  v_ <- train.data.binary[,i]
+  newdf <- model.matrix(~v_-1,data=train.data.binary)
+  colnames(newdf) <- paste(colnames(train.data.binary)[i], c(colnames(newdf)), sep = "_")
+  train.data.binary <- data.frame(train.data.binary, newdf)
+}
+
+rm(v_)
+
+for(m in categorical.indexes){
+  v_ <- test.data.binary[,m]
+  newdf1 <- model.matrix(~v_-1,data=test.data.binary)
+  colnames(newdf1) <- paste(colnames(test.data.binary)[m], c(colnames(newdf1)), sep = "_")
+  test.data.binary <- data.frame(test.data.binary, newdf1)
+}
+
+train.data.binary <- train.data.binary[,-categorical.indexes]
+test.data.binary <- test.data.binary[,-categorical.indexes]
+str(train.data.binary)
+```
+
+16. Using h2o.randomForest to make the second dimensionality reduction
+```{r}
+train.data.rf.test <- train.data.binary
+train.data.rf.test["Response"] <- train.data.processed.convert$Response
+
+library(h2o)
+h2o.init(nthreads = -1)
+```
+
+```{r}
+trainHex <- as.h2o(train.data.rf.test)
+features <- names(trainHex)[-774]
+rfHex <- h2o.randomForest(x = features,
+                          y = "Response", 
+                          model_id = "rfHex_features",
+                          training_frame = trainHex,
+                          ntrees = 300,
+                          seed = 1126
+)
+rfHex_importance <- as.data.frame(rfHex@model$variable_importances)
+which(cumsum(rfHex_importance$percentage) > 0.95)[1]
+important_features <- rfHex_importance$variable[1:which(cumsum(rfHex_importance$percentage) > 0.95)[1]]
+```
+
+```{r}
+important_features
+```
+
+17. Using Linear Regression to make the third dimensionality reduction
+```{r}
+train.data.lessDim <- train.data.rf.test[important_features]
+train.data.lessDim["Response"] <- train.data.processed.convert$Response
+
+# create linear regression model using train.data.processed.convert
+lm.model.reduceDim2 <- lm(Response ~ ., data=train.data.lessDim)
+#summary(lm.model.reduceDim)
+
+# select column that p value <= 0.05, creat new dataframe
+p_val2 <- summary(lm.model.reduceDim2)$coef
+select_col2 <- rownames(data.frame(p_val2[p_val2[,4] <= 0.05, 4])[,0])
+length(select_col2)
+train.data.lessDim <- train.data.lessDim[,select_col2]
+str(train.data.lessDim)
+```
+
+18. prepare for SVM model 
+```{r}
+library(e1071)
+train.data.final <- train.data.lessDim
+train.data.final[,"Response"] <- train.data.processed.convert[,"Response"]
+train.data.final[,"Response"][train.data.final[,"Response"]==1] <- "a"
+train.data.final[,"Response"][train.data.final[,"Response"]==2] <- "b"
+train.data.final[,"Response"][train.data.final[,"Response"]==3] <- "c"
+train.data.final[,"Response"][train.data.final[,"Response"]==4] <- "d"
+train.data.final[,"Response"][train.data.final[,"Response"]==5] <- "e"
+train.data.final[,"Response"][train.data.final[,"Response"]==6] <- "f"
+train.data.final[,"Response"][train.data.final[,"Response"]==7] <- "g"
+train.data.final[,"Response"][train.data.final[,"Response"]==8] <- "h"
+
+train.data.final[,52]<-as.factor(train.data.final[,52])
+
+sample_index = sample(59381, 10000)
+test_dateset = train.data.final[sample_index,]
+train_dateset = train.data.final[-sample_index,]
+
+str(train.data.final)
+```
+
+19. Using SVM model for train_dateset
+```{r}
+#tuned.train <- tune.svm(train_dateset$train.data.processed.convert.Response ~ ., data = train_dateset, gamma = 10^(-1:1), cost = 10^(-1:1))
+#summary(tuned)
+library(e1071)
+svmmodel <- svm(Response ~ ., data = train_dateset, kernel = "radial", cost = 1, gamma = 0.01, scale = F)
+summary(svmmodel)
+```
+
+20. Using predict to make the predictions and present with table
+```{r}
+predictions <- predict(svmmodel, test_dateset[,-52])
+table(pred = predictions, true = test_dateset[,52])
+
+preTab <- table(predictions, test_dateset[,52])
+for(i in c(1:8)) total[i] <- preTab[i,i]
+sum(total)/nrow(test_dateset)
+```
+
+21. Calculate the Performance of SVM model using accuracy function
+```{r}
+actualValue <- as.integer(test_dateset[,52])
+predictValue <- as.integer(data.frame(predictions)[,1])
+
+library("forecast")
+accuracy(actualValue,predictValue)
+```
+
+22. Calculate text.csv Response
+```{r}
+interCols <- intersect(colnames(test.data.binary), colnames(train.data.final))
+
+test.data.final <- test.data.binary[,interCols]
+# str(test.data.final)
+predictions_test <- predict(svmmodel, test.data.final)
+
+#table(predictions_test)
+data.frame(test.data.processed.filling$Id, as.integer(data.frame(predictions_test)[,1]))
+```
+
+
+
+
+Runing SVM takes too much time, we can actually combine 51 columns into several columns.
+PCA(Principal component analysis) model can make it possible.
+PCA will generate a composite Variable that is a result of all the columns,
+it gives the weight to every columns and calculate a composite result.
+
+23. Using PCA model to combine 51 variable into 1 column
+```{r}
+train.data.lessDim.pca <- train.data.lessDim
+
+library(stats)
+pca.train.fit <- princomp(train.data.lessDim.pca, cor = FALSE)
+summary(pca.train.fit)
+composite1 <- loadings(pca.train.fit)[1:51,1]
+composite1 
+#pca.train.fit$loadings[1:51,1]
+```
+
+23. Create SVM model again using Composite.1 variable
+```{r}
+
+```
+
+
+
+
+
